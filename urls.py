@@ -1,5 +1,10 @@
-from handlers import *
+from tornado.web import url
+
+from handlers import HomeHandler, RegistrationHandler, LoginHandler, LogoutHandler
 
 urls = [
-    (r'/', HomeHandler)
+    url(r'/$', HomeHandler, name='home'),
+    url(r'/login$', LoginHandler, name='login'),
+    url(r'/logout$', LogoutHandler, name='logout'),
+    url(r'/registration$', RegistrationHandler, name='registration'),
 ]
