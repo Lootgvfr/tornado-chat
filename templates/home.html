@@ -1,3 +1,35 @@
 {% extends "base.html" %}
+
 {% block title %}Chat probably{% end %}
-{% block content %}kek kek{% end %}
+
+{% block additional_styles %}
+    <link href="{{ static_url('css/home.css') }}" rel="stylesheet">
+{% end %}
+
+{% block content %}
+    <div class="row">
+        <div class="panel panel-default chat-panel">
+            <div class="panel-body">
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <form id="messageForm" data-link="{{ reverse_url('send-message') }}" method="post">
+            {% module xsrf_form_html() %}
+            <div class="col-md-8 col-md-offset-1">
+                <textarea class="form-control" id="msg-text" rows="2" name="message" placeholder="Your message"></textarea>
+            </div>
+            <div class="col-md-2">
+                <button id="send" type="submit" class="btn btn-primary ajax-btn pull-right">Send</button>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <span id="error-text" class="error text-danger"></span>
+    </div>
+{% end %}
+
+{% block additional_js %}
+    <script src="{{ static_url('js/home.js') }}"></script>
+{% end %}

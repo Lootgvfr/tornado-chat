@@ -1,0 +1,22 @@
+.chat-panel{
+    box-shadow: inset 0px 0px 7px #BBBBBB;
+    height: 500px;
+    border-radius: 5px;
+    margin: 5px 15px 5px 15px;
+}
+
+#msg-text{
+    resize: none;
+}
+
+#send{
+    margin-top: 9px;
+    width: 100%;
+}
+
+#error-text{
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 9px;
+}

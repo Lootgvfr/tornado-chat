@@ -1,11 +1,11 @@
 /**
- * Created by D-N on 15/02/2017.
+ * Created by D-N on 17/02/2017.
  */
 
-var form = $('#regForm');
+var form = $('#messageForm');
 var error = $('#error-text');
 
-form.on('submit', function (event) {
+form.on('submit', function(event){
     event.preventDefault();
     error.html('');
     $.ajax({
@@ -17,9 +17,16 @@ form.on('submit', function (event) {
             if (data.type == 'error') {
                 error.html(data.message);
             }
-            else if (data.type == 'redirect') {
-                window.location.href = data.redirect_url;
+            else if (data.type == 'success') {
+                $('#msg-text').val('');
             }
         }
     });
+});
+
+$("#msg-text").keypress(function (event) {
+    if (event.keyCode == 13 && !event.shiftKey) {
+        form.trigger('submit');
+        event.preventDefault();
+    }
 });

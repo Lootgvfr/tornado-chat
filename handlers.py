@@ -82,3 +82,13 @@ class RegistrationHandler(BaseHandler):
                 'message': str(e)
             }
         self.write(result)
+
+
+class SendMessageHandler(BaseHandler):
+    def post(self):
+        message = self.get_argument('message')
+        print('{0} wrote {1}'.format(self.current_user.username, message))
+        result = {
+            'type': 'success'
+        }
+        self.write(result)

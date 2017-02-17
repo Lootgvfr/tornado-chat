@@ -1,10 +1,12 @@
 from tornado.web import url
 
-from handlers import HomeHandler, RegistrationHandler, LoginHandler, LogoutHandler
+from handlers import HomeHandler, RegistrationHandler, LoginHandler,\
+    LogoutHandler, SendMessageHandler
 
 urls = [
     url(r'/$', HomeHandler, name='home'),
     url(r'/login$', LoginHandler, name='login'),
     url(r'/logout$', LogoutHandler, name='logout'),
     url(r'/registration$', RegistrationHandler, name='registration'),
+    url(r'/send_message$', SendMessageHandler, name='send-message'),
 ]

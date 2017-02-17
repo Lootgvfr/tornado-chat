@@ -7,6 +7,7 @@ var error = $('#error-text');
 
 form.on('submit', function(event){
     event.preventDefault();
+    error.html('');
     $.ajax({
         url: form.attr('data-link'),
         type: 'POST',
