@@ -1,21 +1,34 @@
 import tornado.web
+import tornado.websocket
 
-from models import User
+from models import User, Message
 from helpers import encode_password, check_password
+from settings import host
+from chat import chat_obj
 
 
-class BaseHandler(tornado.web.RequestHandler):
+class CurrentUserMixin:
     def get_current_user(self):
-        username = str(self.get_secure_cookie('auth'), 'utf-8')
+        cookie = self.get_secure_cookie('auth')
         try:
+            username = str(cookie, 'utf-8')
             return User.objects(username=username)[0]
-        except IndexError as e:
+        except (IndexError, TypeError) as e:
             return None
+
+
+class BaseHandler(CurrentUserMixin, tornado.web.RequestHandler):
+    pass
+
+
+class BaseWebsocketHandler(CurrentUserMixin, tornado.websocket.WebSocketHandler):
+    pass
 
 
 class HomeHandler(BaseHandler):
     def get(self):
-        self.render('home.html')
+        self.render('home.html',
+                    socket_url='ws://{0}{1}'.format(host, self.reverse_url('chat')))
 
 
 class LogoutHandler(BaseHandler):
@@ -84,11 +97,34 @@ class RegistrationHandler(BaseHandler):
         self.write(result)
 
 
-class SendMessageHandler(BaseHandler):
-    def post(self):
-        message = self.get_argument('message')
-        print('{0} wrote {1}'.format(self.current_user.username, message))
+class ChatHandler(BaseWebsocketHandler):
+    def __init__(self, *args, **kwargs):
+        super(ChatHandler, self).__init__(*args, **kwargs)
+        self.id = None
+
+    def open(self):
+        if self.current_user:
+            print(self.current_user.username + ' connected')
+        self.id = chat_obj.add_handler(self)
+        messages = Message.objects.order_by('-dt_sent')[:10]
+        html_messages = [
+            str(self.render_string('message.html', message=msg), 'utf-8') for msg in messages
+        ]
         result = {
-            'type': 'success'
+            'type': 'open',
+            'content': ''.join(html_messages)
         }
-        self.write(result)
+        self.write_message(result)
+
+    def on_message(self, message):
+        if self.current_user:
+            if not 1 <= len(message) <= 500:
+                self.write_message({'type': 'error', 'message': 'Message must be 1 to 500 characters long'})
+            else:
+                self.write_message({'type': 'response'})
+                chat_obj.process_message(message, self.current_user)
+
+    def on_close(self):
+        if self.current_user:
+            print('rip ' + self.current_user.username)
+        chat_obj.remove_handler(self.id)

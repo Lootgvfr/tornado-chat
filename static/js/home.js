@@ -4,24 +4,37 @@
 
 var form = $('#messageForm');
 var error = $('#error-text');
+var chat_container = $('#chat-container');
+var panel = $('#panel-content');
+var socket = new WebSocket(form.attr('data-socket-url'));
+
+socket.onmessage = function (event) {
+    var result = JSON.parse(event.data);
+    if (result.type == 'response'){
+        $('#msg-text').val('');
+    }
+    else if (result.type == 'new_message'){
+        panel.prepend(result.content);
+        chat_container.scrollTop(0);
+    }
+    else if (result.type == 'open'){
+        panel.prepend(result.content);
+    }
+    else if (result.type == 'error'){
+        error.html(result.message);
+    }
+};
+
+socket.onerror = function (error) {
+    alert('topkek failed: ' + error.message);
+};
 
 form.on('submit', function(event){
     event.preventDefault();
     error.html('');
-    $.ajax({
-        url: form.attr('data-link'),
-        type: 'POST',
-        dataType: 'json',
-        data: form.serialize(),
-        success: function (data) {
-            if (data.type == 'error') {
-                error.html(data.message);
-            }
-            else if (data.type == 'success') {
-                $('#msg-text').val('');
-            }
-        }
-    });
+    var msg = $('#msg-text').val();
+    //if (msg) socket.send(msg);
+    socket.send(msg);
 });
 
 $("#msg-text").keypress(function (event) {

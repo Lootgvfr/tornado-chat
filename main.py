@@ -10,7 +10,7 @@ def main():
     mongoengine.connect(mongo_db_name)
 
     app = tornado.web.Application(urls, **settings)
-    app.listen(8889)
+    app.listen(port)
     tornado.ioloop.IOLoop.current().start()
 
 if __name__ == "__main__":
